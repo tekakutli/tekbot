@@ -73,7 +73,7 @@ var JoinTrigger = hbot.Trigger{
 	},
 	func(bot *hbot.Bot, m *hbot.Message) bool {
 		if m.From == irc_nick {
-			core.Bot.Reply(m, bot_name+": I'm "+bot_name+", ready to serve you")
+			// core.Bot.Reply(m, bot_name+": I'm "+bot_name+", ready to serve you")
 			return false
 		}
 		return false
@@ -89,7 +89,7 @@ var StringTrigger = hbot.Trigger{
 		if strings.Contains(m.From, irc_nick) {
 			return false
 		}
-		if (strings.Contains(m.Content, bot_name) || strings.Contains(m.Content, strings.ToLower(bot_name))) {
+		if strings.Contains(strings.ToLower(m.Content), strings.ToLower(bot_name)) {
 			core.Bot.Reply(m, bot_name+" is typing...")
 			out, err := exec.Command("/bin/sh", "../../answer.sh", m.Content).Output()
 			if err != nil {

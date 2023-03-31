@@ -1,4 +1,6 @@
 server = "irc.libera.chat:6697"
 nick = "tekbot"
 ssl = true
-channels = ["#localmodels"]
+# channels = ["#localmodels"]
+# channels = ["#tektest"]
+channels = ["#localmodels", "#tektest"]

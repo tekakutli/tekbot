@@ -18,6 +18,8 @@ def main():
                     output=output+x
                     if  output.count("Anon:")>1:
                         break
+                    if  output.count("Miku:")>1:
+                        break
             except KeyboardInterrupt:
                 break
             except:
