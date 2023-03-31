@@ -3,12 +3,19 @@ package main
 import (
 	"flag"
 	"log"
+    "os/exec"
+	"strings"
 
 	hbot "github.com/whyrusleeping/hellabot"
 	"github.com/whyrusleeping/hellabot/examples/commands/command"
 	"github.com/whyrusleeping/hellabot/examples/commands/config"
 	log15 "gopkg.in/inconshreveable/log15.v2"
 )
+
+var irc_nick = "tekbot"
+var bot_name = "gMiku"
+
+
 
 // Flags for passing arguments to the program
 var configFile = flag.String("config", "production.toml", "path to config file")
@@ -45,7 +52,8 @@ func main() {
 	// Setup the command environment
 	core = &command.Core{bot, &conf}
 	// Add the command trigger (this is what triggers all command handling)
-	bot.AddTrigger(CommandTrigger)
+	bot.AddTrigger(StringTrigger)
+	bot.AddTrigger(JoinTrigger)
 	// Set the default bot logger to stdout
 	bot.Logger.SetHandler(log15.StdoutHandler)
 	// Initialize the command list
@@ -53,32 +61,42 @@ func main() {
 		Prefix:   "!",
 		Commands: make(map[string]command.Command),
 	}
-	// Add commands to handle
-	cmdList.AddCommand(command.Command{
-		Name:        "kudos",
-		Description: "Send kudos to a teammate- '!kudos <teammate>'",
-		Usage:       "!kudos <teammate>",
-		Run:         core.Kudos,
-	})
-	cmdList.AddCommand(command.Command{
-		Name:        "cve",                                                                // Trigger word
-		Description: "Fetches information about the CVE number from http://cve.circl.lu/", // Description
-		Usage:       "!cve CVE-2017-7494",                                                 // Usage example
-		Run:         core.GetCVE,                                                          // Function or method to run when it triggers
-	})
 
 	// Start up bot (blocks until disconnect)
 	bot.Run()
 	log.Println("Bot shutting down.")
 }
 
+var JoinTrigger = hbot.Trigger{
+	func(bot *hbot.Bot, m *hbot.Message) bool {
+		return m.Command == "JOIN"
+	},
+	func(bot *hbot.Bot, m *hbot.Message) bool {
+		if m.From == irc_nick {
+			core.Bot.Reply(m, bot_name+": I'm "+bot_name+", ready to serve you")
+			return false
+		}
+		return false
+	},
+}
+
 // CommandTrigger passes all incoming messages to the commandList parser.
-var CommandTrigger = hbot.Trigger{
+var StringTrigger = hbot.Trigger{
 	func(bot *hbot.Bot, m *hbot.Message) bool {
 		return m.Command == "PRIVMSG"
 	},
 	func(bot *hbot.Bot, m *hbot.Message) bool {
-		cmdList.Process(bot, m)
+		if strings.Contains(m.From, irc_nick) {
+			return false
+		}
+		if (strings.Contains(m.Content, bot_name) || strings.Contains(m.Content, strings.ToLower(bot_name))) {
+			core.Bot.Reply(m, bot_name+" is typing...")
+			out, err := exec.Command("/bin/sh", "../../answer.sh", m.Content).Output()
+			if err != nil {
+				// log.Fatal(err)
+			}
+			core.Bot.Reply(m, string(out))
+		}
 		return false
 	},
 }

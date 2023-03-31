@@ -1,4 +1,4 @@
-server = "irc.theairlock.net:7778"
-nick = "hellabot"
+server = "irc.libera.chat:6697"
+nick = "tekbot"
 ssl = true
-channels = ["#test", "#test2:somepassword"]
+channels = ["#localmodels"]

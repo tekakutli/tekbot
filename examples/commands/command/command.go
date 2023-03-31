@@ -1,8 +1,6 @@
 package command
 
 import (
-	"bytes"
-	"fmt"
 	"strings"
 
 	"github.com/whyrusleeping/hellabot/examples/commands/config"
@@ -46,30 +44,6 @@ func (cl *List) Process(bot *hbot.Bot, m *hbot.Message) {
 		commandstring := parts[0]
 		cmd, ok := cl.Commands[commandstring]
 		if !ok {
-			if commandstring == "help" {
-				if len(parts) < 2 {
-					bot.Msg(m.From, "Here's what I can do:")
-					var commands bytes.Buffer
-					i := 0
-					for _, cmd := range cl.Commands {
-						i = i + 1
-						commands.WriteString(cmd.Name)
-						if i != len(cl.Commands) {
-							commands.WriteString(", ")
-						}
-					}
-					bot.Msg(m.From, commands.String())
-					bot.Msg(m.From, fmt.Sprintf("The prefix for all these commands is: \"%s\"", cl.Prefix))
-					bot.Msg(m.From, fmt.Sprintf("See %shelp <command> for detailed information", cl.Prefix))
-				} else {
-					helpcmd, helpok := cl.Commands[parts[1]]
-					if helpok {
-						bot.Msg(m.From, fmt.Sprintf("%s: %s", helpcmd.Description, helpcmd.Usage))
-					} else {
-						bot.Msg(m.From, fmt.Sprintf("No such command: %s", parts[1]))
-					}
-				}
-			}
 			return
 		}
 		// looks good, get the quote and reply with the result
